@@ -73,7 +73,7 @@ class RoomMessageTouchHelperCallback(
 
     override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: EpoxyViewHolder): Int {
         if (handler.canSwipeModel(viewHolder.model)) {
-            return ItemTouchHelper.Callback.makeMovementFlags(0, ItemTouchHelper.START) // Should we use Left?
+            return ItemTouchHelper.Callback.makeMovementFlags(0, ItemTouchHelper.END)
         } else {
             return 0
         }

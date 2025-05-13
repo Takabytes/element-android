@@ -513,6 +513,7 @@ class TimelineViewModel @AssistedInject constructor(
             is RoomDetailAction.EndPoll -> handleEndPoll(action.eventId)
             RoomDetailAction.StopLiveLocationSharing -> handleStopLiveLocationSharing()
             RoomDetailAction.OpenElementCallWidget -> handleOpenElementCallWidget()
+            is RoomDetailAction.MarkAsUnread -> handleMarkAsUnread()
         }
     }
 
@@ -1505,5 +1506,18 @@ class TimelineViewModel @AssistedInject constructor(
         markThreadTimelineAsReadLocal()
         locationSharingServiceConnection.unbind(this)
         super.onCleared()
+    }
+
+    private fun handleMarkAsUnread() = withState { state ->
+        if (state.unreadState is UnreadState.HasNoUnread) {
+            if (room == null) return@withState
+            viewModelScope.launch {
+                tryOrNull { 
+                    room.readService().setReadMarker("")
+                    setState { copy(unreadState = UnreadState.HasUnread("", "")) }
+                    _viewEvents.post(RoomDetailViewEvents.ShowMessage("Salle marquée comme non lue"))
+                }
+            }
+        }
     }
 }

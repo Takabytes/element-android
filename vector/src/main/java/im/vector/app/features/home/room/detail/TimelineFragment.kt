@@ -188,7 +188,9 @@ import org.matrix.android.sdk.api.session.Session
 import org.matrix.android.sdk.api.session.events.model.EventType
 import org.matrix.android.sdk.api.session.events.model.content.EncryptedEventContent
 import org.matrix.android.sdk.api.session.events.model.content.WithHeldCode
+import org.matrix.android.sdk.api.session.events.model.getRelationContent
 import org.matrix.android.sdk.api.session.events.model.toModel
+import org.matrix.android.sdk.api.session.getRoom
 import org.matrix.android.sdk.api.session.room.model.Membership
 import org.matrix.android.sdk.api.session.room.model.RoomSummary
 import org.matrix.android.sdk.api.session.room.model.message.MessageAudioContent
@@ -904,8 +906,16 @@ class TimelineFragment :
                 }
                 true
             }
+            R.id.menu_mark_as_unread -> {
+                markRoomAsUnread()
+                true
+            }
             else -> false
         }
+    }
+
+    private fun markRoomAsUnread() {
+        timelineViewModel.handle(RoomDetailAction.MarkAsUnread)
     }
 
     /**
@@ -1558,9 +1568,15 @@ class TimelineFragment :
                 navigateToLiveLocationMap()
             }
             else -> {
-                val handled = onThreadSummaryClicked(informationData.eventId, isRootThreadEvent)
-                if (!handled) {
-                    Timber.d("No click action defined for this message content")
+                // Si le message est épinglé, on navigue vers le message original
+                val event = session.getRoom(timelineArgs.roomId)?.timelineService()?.getTimelineEvent(informationData.eventId)
+                if (event?.root?.getRelationContent()?.inReplyTo?.eventId != null) {
+                    timelineViewModel.handle(RoomDetailAction.NavigateToEvent(event.root.getRelationContent()?.inReplyTo?.eventId!!, true))
+                } else {
+                    val handled = onThreadSummaryClicked(informationData.eventId, isRootThreadEvent)
+                    if (!handled) {
+                        Timber.d("No click action defined for this message content")
+                    }
                 }
             }
         }

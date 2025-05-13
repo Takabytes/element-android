@@ -100,22 +100,13 @@
                 android:layout_marginTop="22dp">
 
                 <Button
-                    android:id="@+id/forgetPasswordButton"
-                    style="@style/Widget.Vector.Button.Text.Login"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="start"
-                    android:text="@string/auth_forgot_password" />
-
-                <Button
                     android:id="@+id/loginSubmit"
                     style="@style/Widget.Vector.Button.Login"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="end"
                     android:text="@string/auth_login"
-                    tools:enabled="false"
-                    tools:ignore="RelativeOverlap" />
+                    tools:enabled="false" />
 
             </FrameLayout>
 

@@ -62,7 +62,6 @@ class LoginFragment :
         super.onViewCreated(view, savedInstanceState)
 
         setupSubmitButton()
-        setupForgottenPasswordButton()
 
         views.passwordField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -71,10 +70,6 @@ class LoginFragment :
             }
             return@setOnEditorActionListener false
         }
-    }
-
-    private fun setupForgottenPasswordButton() {
-        views.forgetPasswordButton.debouncedClicks { forgetPasswordClicked() }
     }
 
     private fun setupAutoFill(state: LoginViewState) {
@@ -210,8 +205,6 @@ class LoginFragment :
     }
 
     private fun setupButtons(state: LoginViewState) {
-        views.forgetPasswordButton.isVisible = state.signMode == SignMode.SignIn
-
         views.loginSubmit.text = getString(
                 when (state.signMode) {
                     SignMode.Unknown -> error("developer error")
@@ -236,10 +229,6 @@ class LoginFragment :
                     views.loginSubmit.isEnabled = it
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun forgetPasswordClicked() {
-        loginViewModel.handle(LoginAction.PostViewEvent(LoginViewEvents.OnForgetPasswordClicked))
     }
 
     override fun resetViewModel() {

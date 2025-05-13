@@ -12,6 +12,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.EditorInfo
 import androidx.autofill.HintConstants
 import androidx.core.view.isVisible
 import androidx.lifecycle.flowWithLifecycle
@@ -56,14 +57,17 @@ class FtueAuthCombinedLoginFragment :
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         setupSubmitButton()
-        views.loginRoot.realignPercentagesToParent()
-        views.editServerButton.debouncedClicks { viewModel.handle(OnboardingAction.PostViewEvent(OnboardingViewEvents.EditServerSelection)) }
-        views.loginPasswordInput.setOnImeDoneListener { submit() }
-        views.loginInput.setOnFocusLostListener(viewLifecycleOwner) {
-            viewModel.handle(OnboardingAction.UserNameEnteredAction.Login(views.loginInput.content()))
+//        setupForgottenPasswordButton()
+
+        views.loginPasswordEditText.setOnEditorActionListener { _, actionId, _ ->
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                submit()
+                return@setOnEditorActionListener true
+            }
+            return@setOnEditorActionListener false
         }
-        views.loginForgotPassword.debouncedClicks { viewModel.handle(OnboardingAction.PostViewEvent(OnboardingViewEvents.OnForgetPasswordClicked)) }
     }
 
     private fun setupSubmitButton() {
@@ -75,6 +79,10 @@ class FtueAuthCombinedLoginFragment :
             views.loginSubmit.isEnabled = account.isNotEmpty() && password.isNotEmpty()
         }.flowWithLifecycle(lifecycle).launchIn(viewLifecycleOwner.lifecycleScope)
     }
+
+   /* private fun setupForgottenPasswordButton() {
+        views.loginForgotPassword.setOnClickListener { forgetPasswordClicked() }
+    }*/
 
     private fun submit() {
         cleanupUi()
@@ -107,7 +115,7 @@ class FtueAuthCombinedLoginFragment :
     }
 
     override fun updateWithState(state: OnboardingViewState) {
-        setupUi(state)
+        setupUi()
         setupAutoFill()
 
         views.selectedServerName.text = state.selectedHomeserver.userFacingUrl.toReducedUrl()
@@ -118,39 +126,8 @@ class FtueAuthCombinedLoginFragment :
         }
     }
 
-    private fun setupUi(state: OnboardingViewState) {
-        when (state.selectedHomeserver.preferredLoginMode) {
-            is LoginMode.SsoAndPassword -> {
-                showUsernamePassword()
-                renderSsoProviders(state.deviceId, state.selectedHomeserver.preferredLoginMode)
-            }
-            is LoginMode.Sso -> {
-                hideUsernamePassword()
-                renderSsoProviders(state.deviceId, state.selectedHomeserver.preferredLoginMode)
-            }
-            else -> {
-                showUsernamePassword()
-                hideSsoProviders()
-            }
-        }
-    }
-
-    private fun renderSsoProviders(deviceId: String?, loginMode: LoginMode) {
-        views.ssoGroup.isVisible = true
-        views.ssoButtonsHeader.isVisible = isUsernameAndPasswordVisible()
-        views.ssoButtons.render(loginMode, SocialLoginButtonsView.Mode.MODE_CONTINUE) { id ->
-            viewModel.fetchSsoUrl(
-                    redirectUrl = SSORedirectRouterActivity.VECTOR_REDIRECT_URL,
-                    deviceId = deviceId,
-                    provider = id,
-                    action = SSOAction.LOGIN
-            )?.let { openInCustomTab(it) }
-        }
-    }
-
-    private fun hideSsoProviders() {
-        views.ssoGroup.isVisible = false
-        views.ssoButtons.ssoIdentityProviders = null
+    private fun setupUi() {
+        showUsernamePassword()
     }
 
     private fun hideUsernamePassword() {

@@ -129,4 +129,6 @@ sealed class RoomDetailAction : VectorViewModelAction {
             data class SeekTo(val voiceBroadcast: VoiceBroadcast, val positionMillis: Int, val duration: Int) : Listening()
         }
     }
+
+    object MarkAsUnread : RoomDetailAction()
 }

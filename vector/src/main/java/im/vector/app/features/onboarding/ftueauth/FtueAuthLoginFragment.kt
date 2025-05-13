@@ -74,7 +74,6 @@ class FtueAuthLoginFragment :
         super.onViewCreated(view, savedInstanceState)
 
         setupSubmitButton()
-        setupForgottenPasswordButton()
 
         views.passwordField.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -83,10 +82,6 @@ class FtueAuthLoginFragment :
             }
             return@setOnEditorActionListener false
         }
-    }
-
-    private fun setupForgottenPasswordButton() {
-        views.forgetPasswordButton.setOnClickListener { forgetPasswordClicked() }
     }
 
     private fun setupAutoFill(state: OnboardingViewState) {
@@ -225,8 +220,6 @@ class FtueAuthLoginFragment :
     }
 
     private fun setupButtons(state: OnboardingViewState) {
-        views.forgetPasswordButton.isVisible = state.signMode == SignMode.SignIn
-
         views.loginSubmit.text = getString(
                 when (state.signMode) {
                     SignMode.Unknown -> error("developer error")
@@ -251,10 +244,6 @@ class FtueAuthLoginFragment :
                     views.loginSubmit.isEnabled = it
                 }
                 .launchIn(viewLifecycleOwner.lifecycleScope)
-    }
-
-    private fun forgetPasswordClicked() {
-        viewModel.handle(OnboardingAction.PostViewEvent(OnboardingViewEvents.OnForgetPasswordClicked))
     }
 
     override fun resetViewModel() {
