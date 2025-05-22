@@ -13,6 +13,8 @@ import im.vector.app.features.notifications.NotificationUtils
 import im.vector.app.features.notifications.SimpleNotifiableEvent
 import io.mockk.every
 import io.mockk.mockk
+import io.mockk.slot
+import io.mockk.verify
 
 class FakeNotificationUtils {
 
@@ -28,5 +30,29 @@ class FakeNotificationUtils {
         val mockNotification = mockk<Notification>()
         every { instance.buildSimpleEventNotification(event, myUserId) } returns mockNotification
         return mockNotification
+    }
+
+    fun givenBuildSummaryListNotification(): Notification {
+        val mockNotification = mockk<Notification>()
+        every {
+            instance.buildSummaryListNotification(
+                any(),
+                any(),
+                noisy = any(),
+                lastMessageTimestamp = any()
+            )
+        } returns mockNotification
+        return mockNotification
+    }
+
+    fun verifyBuildSummaryListNotificationCalledWith(compatSummary: String) {
+        verify {
+            instance.buildSummaryListNotification(
+                any(),
+                compatSummary,
+                noisy = any(),
+                lastMessageTimestamp = any()
+            )
+        }
     }
 }

@@ -55,8 +55,8 @@ class SummaryGroupMessageCreator @Inject constructor(
                 ?: invitationNotifications.lastOrNull()?.timestamp
                 ?: simpleNotifications.last().timestamp
 
-        // FIXME roomIdToEventMap.size is not correct, this is the number of rooms
-        val nbEvents = roomNotifications.size + simpleNotifications.size
+        // Count each message event individually instead of counting the rooms only
+        val nbEvents = messageCount + invitationNotifications.size + simpleNotifications.size
         val sumTitle = stringProvider.getQuantityString(CommonPlurals.notification_compat_summary_title, nbEvents, nbEvents)
         summaryInboxStyle.setBigContentTitle(sumTitle)
                 // TODO get latest event?
